@@ -1,17 +1,13 @@
 library(rvest)
+##Note: have to put all URLs inside double quotes.
 SPPS_URL <- "https://journals.sagepub.com/doi/pdf/"
 SPPS_DOWNLOAD_URL <- "/?download=true"
-SPPS_BASE_URL <- "https://journals.sagepub.com/toc/sppa/13"
+SPPS_BASE_URL <- "https://journals.sagepub.com/toc/sppa"
+SPPS_VOLUME_BASE_URL <- "https://journals.sagepub.com/loi/sppa/group/"
 startdir = "~/Downloads"
 enddir = "~/Documents/Miami!/Year 2/DARNFiles/"
 
-#Sample URL: "https://journals.sagepub.com/toc/sppa/13/1"
-##In reality: run function/sapply for multiple volumes at once 
-##Probably: sapply(list of base URLs), download_files(1,8))
 
-
-#Change function to input volume? Automate determining issues?
-##Note: have to put the URL inside double quotes.
 download_files = function(volume) {
     startdir="~/Downloads/"
     enddir = "~/Documents/Miami!/Year 2/DARNFiles/"
@@ -19,18 +15,23 @@ download_files = function(volume) {
       dir.create(file.path(enddir), recursive=TRUE)
     }
     
+
     if (volume > 10){
       spps_decade = "d2020"
     } else if (volume<11) {
       spps_decade="d2010"
     } else {spps_decade='ERROR'}
+    spps_year = paste('y',toString(volume+2009), sep='')
     
-    spps_year = toString(volume+2009)
+    volumeurl = paste(SPPS_VOLUME_BASE_URL, spps_decade, sep = '') %>%
+      paste(spps_year, sep='.')
+    volumepage = read_html(volumeurl)
+    volumelinks <- volumepage %>% html_nodes("a") %>% html_attr("href")
+    volumelinks <- volumelinks[which(regexpr(toString(volume), volumelinks) >= 1 & regexpr('toc', volumelinks) >= 1)]
     
     
-    
-    for (j in issuestart:issueend) {
-      url = paste(SPPS_BASE_URL, j, sep = '/')
+    for (j in 1:length(volumelinks)) {
+      url = paste(SPPS_BASE_URL, volume, j, sep = '/')
       page=read_html(url)
       links <- page %>% html_nodes("a") %>% html_attr("href")
       links <- links[which(regexpr('abs', links) >= 1)]
@@ -61,10 +62,4 @@ download_files = function(volume) {
 ###PROBLEM below
 #Set up warning/issue if files don't copy 
 #Check that the numbers are equal, if not, print something warning that not all were transferred, but not likely to happen
-
-
-##Another option: add loop
-#SPPS: from volstart (8) and volend (14), append to https://journals.sagepub.com/toc/sppa/VOLNUM/ISSUENUM
-#add to end: /IssueStart to /IssueEnd (1:8)
-
 
