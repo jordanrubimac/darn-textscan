@@ -49,21 +49,8 @@ download_files = function(issuestart, issueend) {
 
 
 ###PROBLEM below
-#Goal: #Make a new folder
-#Move files from downloads to the new folder
-
-
-
-
 #Set up warning/issue if files don't copy 
 #Check that the numbers are equal, if not, print something warning that not all were transferred, but not likely to happen
-
-#my.file.rename <- function(from, to) {
-#  todir <- dirname(to)
-#  if (!isTRUE(file.info(todir)$isdir)) dir.create(todir, recursive=TRUE)
-#  file.rename(from = from,  to = to)
-#}
-#sapply(filenames, function(x) my.file.rename(from, to))
 
 
 ##Another option: add loop
