@@ -12,12 +12,22 @@ enddir = "~/Documents/Miami!/Year 2/DARNFiles/"
 
 #Change function to input volume? Automate determining issues?
 ##Note: have to put the URL inside double quotes.
-download_files = function(issuestart, issueend) {
+download_files = function(volume) {
     startdir="~/Downloads/"
     enddir = "~/Documents/Miami!/Year 2/DARNFiles/"
     if (!dir.exists(enddir)) {
       dir.create(file.path(enddir), recursive=TRUE)
     }
+    
+    if (volume > 10){
+      spps_decade = "d2020"
+    } else if (volume<11) {
+      spps_decade="d2010"
+    } else {spps_decade='ERROR'}
+    
+    spps_year = toString(volume+2009)
+    
+    
     
     for (j in issuestart:issueend) {
       url = paste(SPPS_BASE_URL, j, sep = '/')
