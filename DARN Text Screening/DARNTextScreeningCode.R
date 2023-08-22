@@ -43,12 +43,6 @@ pdf_list <- list.files(pdf_files, pattern = "\\.pdf$")
 #Initialize empty DF
 fullresults <- data.frame(matrix(0, ncol = 4, nrow = 0))
 
-#Apply function
-for (i in 1:length(pdf_list)) {
-  current_pdf <- paste(eval(substitute(pdf_files)), '/', pdf_list[i], sep='')
-  currenpdfresults <- screen_pdf_for_terms(current_pdf, terms_to_screen_df)
-  fullresults <- rbind(fullresults, currenpdfresults)
-}
 
 # alt version via chatgpt
 
