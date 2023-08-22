@@ -8,8 +8,9 @@ date: "`r Sys.Date()`"
 knitr::opts_chunk$set(echo = TRUE)
 
 library(rvest)
-library(tidyverse)
+#library(tidyverse)
 library(stringr)
+library(httr)
 ```
 
 # functions
@@ -18,4 +19,9 @@ Here is where the scripts live. If you press the rightward facing green arrow yo
 ```{r functions}
 source("scripts/scraping_spps.R")
 source("scripts/scraping_pspb.R")
+```
+
+```{r}
+
+download_articles_spps(6)
 ```

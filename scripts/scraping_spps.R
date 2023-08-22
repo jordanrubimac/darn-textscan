@@ -8,8 +8,10 @@ download_articles_spps = function(volume,
                                SPPS_VOLUME_BASE_URL = "https://journals.sagepub.com/loi/sppa/group/",
                                startdir = "~/Downloads",
                                enddir = "~/Documents/Miami!/Year 2/DARNFiles/" ) {
+  require(httr)
   require(rvest)
   require(stringr)
+
     startdir = startdir
     enddir = enddir
     if (!dir.exists(enddir)) {
@@ -26,7 +28,12 @@ download_articles_spps = function(volume,
 
     volumeurl = paste0(SPPS_VOLUME_BASE_URL, spps_decade) %>%
       paste(spps_year, sep='.')
-    volumepage = read_html(volumeurl)
+
+    volumepage <- GET(volumeurl,
+                      add_headers('user-agent' = 'Research Project')) %>%
+      # solves Error in open.connection(x, "rb") : HTTP error 403.
+    read_html()
+
     volumelinks <- volumepage %>% html_nodes("a") %>% html_attr("href")
     volumelinks <- volumelinks[which(regexpr(toString(volume), volumelinks) >= 1 & regexpr('toc', volumelinks) >= 1)]
 
