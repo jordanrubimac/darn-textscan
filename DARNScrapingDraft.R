@@ -1,4 +1,5 @@
 library(rvest)
+library(stringr)
 ##Note: have to put all URLs inside double quotes.
 SPPS_URL <- "https://journals.sagepub.com/doi/pdf/"
 SPPS_DOWNLOAD_URL <- "/?download=true"
@@ -42,14 +43,14 @@ download_files = function(volume) {
       urllist = paste(urlPart1, urlYear, urlPart2, sep = '')
       
       for (i in 1:length(urllist)){
-        browseURL(urllist[i])
-      }
-      
+          browseURL(urllist[i])
+        }
+        
       filenames = urlYear %>% str_replace(".*10.1177/", "") %>%
         paste(".pdf", sep = '') #List of file names for moving them
-      
+        
       Sys.sleep(15)   
-      
+        
       file.copy(from = paste0(startdir, filenames),
                 to = paste0(enddir, filenames))
       file.remove(from=paste0(startdir, filenames))
