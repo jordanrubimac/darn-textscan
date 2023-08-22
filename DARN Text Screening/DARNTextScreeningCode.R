@@ -12,11 +12,11 @@ terms_to_screen_df <- read_csv(terms_to_screen_path)
 # Function to screen PDF for terms and get page numbers
 screen_pdf_for_terms <- function(pdf_file, terms_df) {
   text <- pdf_text(eval(substitute(pdf_file)))
-  
+
   cleaned_text <- gsub("[^[:alnum:] ]", "", text)
   cleaned_text <- tolower(cleaned_text)
   cleaned_text <- gsub("\\s+", " ", cleaned_text)
-  
+
   results <- lapply(terms_df$Header, function(term) {
     matches <- grep(term, text, ignore.case = TRUE)
     if (length(matches) > 0) {
@@ -43,12 +43,22 @@ pdf_list <- list.files(pdf_files, pattern = "\\.pdf$")
 #Initialize empty DF
 fullresults <- data.frame(matrix(0, ncol = 4, nrow = 0))
 
-#Apply function 
+#Apply function
 for (i in 1:length(pdf_list)) {
   current_pdf <- paste(eval(substitute(pdf_files)), '/', pdf_list[i], sep='')
   currenpdfresults <- screen_pdf_for_terms(current_pdf, terms_to_screen_df)
   fullresults <- rbind(fullresults, currenpdfresults)
 }
+
+# alt version via chatgpt
+
+screen_function <- function(pdf_name) {
+  current_pdf <- paste(eval(substitute(pdf_files)), '/', pdf_name, sep='')
+  screen_pdf_for_terms(current_pdf, terms_to_screen_df)
+}
+
+results_list <- lapply(pdf_list, screen_function)
+fullresults <- do.call(rbind, results_list)
 
 
 # Display the result
