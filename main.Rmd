@@ -1,0 +1,21 @@
+---
+title: "Main Document"
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(rvest)
+library(tidyverse)
+library(stringr)
+```
+
+# functions
+
+Here is where the scripts live. If you press the rightward facing green arrow you can import all of them into your environment. Note that the functions are in a folder called scripts.
+```{r functions}
+source("scripts/scraping_spps.R")
+source("scripts/scraping_pspb.R")
+```
