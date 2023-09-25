@@ -33,6 +33,6 @@ JPSP_2022 <- read_csv("data/jpsp/2022/PoPCites_2022.csv",
 JPSP_combined <- bind_rows(JPSP_2017, JPSP_2018, JPSP_2019, JPSP_2020, JPSP_2021, JPSP_2022)
 
 
-nrows(JPSP_combined)
+nrow(JPSP_combined)
 
 ```
