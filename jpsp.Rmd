@@ -1,0 +1,38 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+
+```{r}
+library(tidyverse)
+
+# Add a 'year' column to each data frame
+JPSP_2017 <- read_csv("data/jpsp/2017/PoPCites_2017.csv",
+                      show_col_types = FALSE) %>%
+  mutate(year = 2017)
+JPSP_2018 <- read_csv("data/jpsp/2018/PoPCites_2018.csv",
+                      show_col_types = FALSE) %>%
+  mutate(year = 2018)
+JPSP_2019 <- read_csv("data/jpsp/2019/PoPCites_2019.csv",
+                      show_col_types = FALSE)  %>%
+  mutate(year = 2019)
+JPSP_2020 <- read_csv("data/jpsp/2020/PoPCites_2020.csv",
+                      show_col_types = FALSE) %>%
+  mutate(year = 2020)
+JPSP_2021 <- read_csv("data/jpsp/2021/PoPCites_2021.csv",
+                      show_col_types = FALSE) %>%
+  mutate(year = 2021)
+JPSP_2022 <- read_csv("data/jpsp/2022/PoPCites_2022.csv",
+                      show_col_types = FALSE) %>%
+  mutate(year = 2022)
+
+
+# Combine all the data frames into one
+JPSP_combined <- bind_rows(JPSP_2017, JPSP_2018, JPSP_2019, JPSP_2020, JPSP_2021, JPSP_2022)
+
+
+nrows(JPSP_combined)
+
+```
