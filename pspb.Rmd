@@ -1,0 +1,40 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+
+```{r}
+library(tidyverse)
+
+# Add a 'year' column to each data frame
+pspb_2017 <- read_csv("data/pspb/2017/PoPCites_2017.csv",
+                      show_col_types = FALSE) %>%
+  mutate(year = 2017)
+pspb_2018 <- read_csv("data/pspb/2018/PoPCites_2018.csv",
+                      show_col_types = FALSE) %>%
+  mutate(year = 2018)
+pspb_2019 <- read_csv("data/pspb/2019/PoPCites_2019.csv",
+                      show_col_types = FALSE)  %>%
+  mutate(year = 2019)
+pspb_2020 <- read_csv("data/pspb/2020/PoPCites_2020.csv",
+                      show_col_types = FALSE) %>%
+  mutate(year = 2020)
+pspb_2021 <- read_csv("data/pspb/2021/PoPCites_2021.csv",
+                      show_col_types = FALSE) %>%
+  mutate(year = 2021)
+pspb_2022 <- read_csv("data/pspb/2022/PoPCites_2022.csv",
+                      show_col_types = FALSE) %>%
+  mutate(year = 2022)
+
+
+# Combine all the data frames into one
+pspb_combined <- bind_rows(pspb_2017, pspb_2018, pspb_2019, pspb_2020, pspb_2021, pspb_2022)
+
+
+nrow(pspb_combined)
+
+```
+
+The average citation for a paper published in pspb in our sample was ``r round(mean(pspb_combined$Cites), digits=3)`` and the median citation was ``r median(pspb_combined$Cites)``. The minimum citation was ``r min(pspb_combined$Cites)`` and the maximum citation was ``r max(pspb_combined$Cites)``. 

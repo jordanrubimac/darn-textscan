@@ -35,4 +35,10 @@ JPSP_combined <- bind_rows(JPSP_2017, JPSP_2018, JPSP_2019, JPSP_2020, JPSP_2021
 
 nrow(JPSP_combined)
 
+
+
 ```
+
+The average citation for a paper published in JSPS in our sample was ``r round(mean(JPSP_combined$Cites), digits=3)`` and the median citation was ``r median(JPSP_combined$Cites)``. The minimum citation was ``r min(JPSP_combined$Cites)`` and the maximum citation was ``r max(JPSP_combined$Cites)``. 
+
+```{r}
