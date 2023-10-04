@@ -14,38 +14,123 @@ source("scripts/helpers.R")
 # Add a 'year' column to each data frame
 SPPS_2017 <- read_csv("data/spps/2017/PoPCites_2017.csv",
                       show_col_types = FALSE) %>%
-  mutate(year = 2017)
+  mutate(Year = 2017)
 SPPS_2018 <- read_csv("data/spps/2018/PoPCites_2018.csv",
                       show_col_types = FALSE) %>%
-  mutate(year = 2018)
+  mutate(Year = 2018)
 SPPS_2019 <- read_csv("data/spps/2019/PoPCites_2019.csv",
                       show_col_types = FALSE)  %>%
-  mutate(year = 2019)
+  mutate(Year = 2019)
 SPPS_2020 <- read_csv("data/spps/2020/PoPCites_2020.csv",
                       show_col_types = FALSE) %>%
-  mutate(year = 2020)
+  mutate(Year = 2020)
 SPPS_2021 <- read_csv("data/spps/2021/PoPCites_2021.csv",
                       show_col_types = FALSE) %>%
-  mutate(year = 2021)
+  mutate(Year = 2021)
 SPPS_2022 <- read_csv("data/spps/2022/PoPCites_2022.csv",
                       show_col_types = FALSE) %>%
-  mutate(year = 2022)
+  mutate(Year = 2022)
 
 
 # Combine all the data frames into one
 SPPS_combined <- bind_rows(SPPS_2017, SPPS_2018, 
-                           SPPS_2019, SPPS_2020, SPPS_2021, SPPS_2022) %>%
-  filter(Title %in% c("Retraction Notice")
-         )
+                           SPPS_2019, SPPS_2020, SPPS_2021, SPPS_2022)
+  
+df<- SPPS_combined
 
+```
 
+```{r}
+combined_df <- df %>%
+  mutate(
+    trimmed_title = str_trunc(str_to_lower(str_squish(Title)), side = "right", width= 50, ellipsis = "…")) %>%
+    mutate(
+      # manually matched some titles
+      trimmed_title = case_when(
+      trimmed_title == "network analysis on attitudes" ~ "network analysis on attitudes: a brief tutorial",
+      RelatedURL == "https://scholar.google.com/scholar?q=related:dZc5rNWeL6MJ:scholar.google.com/&scioq=source:%22social+psychological+and+personality+science%22&hl=en&as_sdt=0,5&as_ylo=2022&as_yhi=2022" ~ 'who gets to vote?: racialized mental images of …', #there was no easy way to use the trimmed title, it had a forbidden character in it
+      trimmed_title == "equality revisited: a cultural meta-analysis of i…" ~ "equality revisited: a cross-cultural meta-analysi…",
+     trimmed_title == "does reduc‑ing prejudice increase outgroup identi…"~  "does reducing implicit prejudice increase out-gro…",
+      trimmed_title == "forthcoming,“laypersons' beliefs and intuitions a…" ~ "laypersons' beliefs and intuitions about free wil…",
+      trimmed_title == "studying the cognitive map of the us states" ~ "studying the cognitive map of the us states: ideo…",
+      trimmed_title == "flekova lucie, giorgi salvatore, hagan courtney, …" ~ "real men don't say “cute” using automatic languag…",
+     trimmed_title == "put the phone down" ~ "put the phone down: testing a complement-interfer…" ,
+      trimmed_title == "worldview conflict in daily life (vol 10, pg 35, …" ~ "worldview conflict in daily life",
+      TRUE ~ trimmed_title
+    )) %>%
+    mutate(
+          Title = str_squish(Title),
+          DOI = case_when(trimmed_title == "who gets to vote?: racialized mental images of …" ~ "10.1177/1948550619899238",
+                    TRUE ~ DOI)
+  )  %>%
+  group_by(trimmed_title) %>%
+  arrange(desc(Cites)) %>%  # Sort within each group based on the number of citations
+  summarise(
+    Title = first(Title),  # Character: Keep first non-NA
+    trimmed_title = first(trimmed_title), 
+    CombinedCites = sum(Cites, na.rm = TRUE),  # Numeric: Sum
+    CombinedAuthors = paste(unique(Authors), collapse = "; "),  # Character: Concatenate unique
+    Year = max(Year, na.rm = TRUE),  # Numeric: Max
+    Source = first(Source),  # Character: Keep first non-NA
+    Publisher = first(Publisher),  # Character: Keep first non-NA
+    ArticleURL = first(ArticleURL),  # Character: Keep first non-NA
+    CitesURL = first(CitesURL),  # Character: Keep first non-NA
+    GSRank = first(GSRank),  # Numeric: Mean
+    QueryDate = first(QueryDate),  # Date: Most recent
+    Type = first(Type),  # Character: Keep first non-NA
+    DOI = first(DOI),  # Character: Keep first non-NA
+    CitationURL = first(CitationURL),  # Logical: Keep first non-NA
+    ECC = first(ECC),  # Numeric: Sum
+    CitesPerYear = first(CitesPerYear),  # Numeric: Mean
+    CitesPerAuthor = first(CitesPerAuthor),  # Numeric: Mean
+    AuthorCount = max(AuthorCount, na.rm = TRUE),  # Numeric: Max
+    Age = max(Age, na.rm = TRUE),  # Numeric: max
+    Abstract = first(Abstract),  # Character
+    FullTextURL = first(FullTextURL),  # Character: Keep first non-NA
+    RelatedURL = first(RelatedURL),  # Character: Keep first non-NA
+  ) %>% ungroup()  %>% 
+  # create unique dummy doi for articles without doi
+  mutate(
+         DOI = case_when(
+    is.na(DOI) ~ paste0("MISSING_DOI_", trimmed_title),
+    TRUE ~ DOI
+  ))  %>%
+  group_by(DOI) %>%
+  arrange(desc(CombinedCites))  %>%  # Sort within each group based on the number of citations
+  summarise(
+    Title = first(Title),  # Character: Keep first non-NA
+    trimmed_title = paste(unique(trimmed_title), collapse = "; "), 
+    CombinedCites = sum(CombinedCites, na.rm = TRUE),  # Numeric: Sum
+    CombinedAuthors = paste(unique(CombinedAuthors), collapse = "; "),  # Character: Concatenate unique
+    Year = max(Year, na.rm = TRUE),  # Numeric: Max
+    Source = first(Source),  # Character: Keep first non-NA
+    Publisher = first(Publisher),  # Character: Keep first non-NA
+    ArticleURL = first(ArticleURL),  # Character: Keep first non-NA
+    CitesURL = first(CitesURL),  # Character: Keep first non-NA
+    GSRank = first(GSRank),  # Numeric: Mean
+    QueryDate = first(QueryDate),  # Date: Most recent
+    Type = first(Type),  # Character: Keep first non-NA
+    DOI = first(DOI),  # Character: Keep first non-NA
+    CitationURL = first(CitationURL),  # Logical: Keep first non-NA
+    ECC = first(ECC),  # Numeric: Sum
+    CitesPerYear = first(CitesPerYear),  # Numeric: Mean
+    CitesPerAuthor = first(CitesPerAuthor),  # Numeric: Mean
+    AuthorCount = max(AuthorCount, na.rm = TRUE),  # Numeric: Max
+    Age = max(Age, na.rm = TRUE),  # Numeric: max
+    Abstract = first(Abstract),  # Character
+    FullTextURL = first(FullTextURL),  # Character: Keep first non-NA
+    RelatedURL = first(RelatedURL),  # Character: Keep first non-NA
+  ) %>% ungroup()
 
-
+```
+```{r}
+# Remove the grouping
 
 
 write.csv(SPPS_combined, "data/SPPS_combined.csv")
+write.csv(combined_df, "data/SPPS_deduplicated.csv")
+df<- combined_df
 
-df<- SPPS_combined
 
 length(unique(df$DOI))
 journal <- "SPPS"
@@ -59,6 +144,7 @@ There are ``r length(unique(df$DOI))`` articles. The average citation for a pape
 # make an interactive table
 library(DT)
 
-df %>% select(Title, Authors, DOI, Cites, year) %>%
+combined_df %>% select(Title, CombinedAuthors, DOI, CombinedCites, Year, ArticleURL, CitesURL, FullTextURL
+              ) %>%
 datatable()
 ```

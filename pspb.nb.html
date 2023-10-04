@@ -1760,16 +1760,16 @@ display: none;
 # Add a &#39;year&#39; column to each data frame
 pspb_2017 &lt;- read_csv(&quot;data/pspb/2017/PoPCites_2017.csv&quot;,
                       show_col_types = FALSE) %&gt;%
-  mutate(year = 2017)
+  mutate(Year = 2017)
 pspb_2018 &lt;- read_csv(&quot;data/pspb/2018/PoPCites_2018.csv&quot;,
                       show_col_types = FALSE) %&gt;%
-  mutate(year = 2018)
+  mutate(Year = 2018)
 pspb_2019 &lt;- read_csv(&quot;data/pspb/2019/PoPCites_2019.csv&quot;,
                       show_col_types = FALSE)  %&gt;%
-  mutate(year = 2019)
+  mutate(Year = 2019)
 pspb_2020 &lt;- read_csv(&quot;data/pspb/2020/PoPCites_2020.csv&quot;,
                       show_col_types = FALSE) %&gt;%
-  mutate(year = 2020)
+  mutate(Year = 2020)
 
 
 # Combine all the data frames into one

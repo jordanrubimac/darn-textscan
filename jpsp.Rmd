@@ -14,31 +14,103 @@ source("scripts/helpers.R")
 # Add a 'year' column to each data frame
 JPSP_2017 <- read_csv("data/jpsp/2017/PoPCites_2017.csv",
                       show_col_types = FALSE) %>%
-  mutate(year = 2017)
+  mutate(Year = 2017)
 JPSP_2018 <- read_csv("data/jpsp/2018/PoPCites_2018.csv",
                       show_col_types = FALSE) %>%
-  mutate(year = 2018)
+  mutate(Year = 2018)
 JPSP_2019 <- read_csv("data/jpsp/2019/PoPCites_2019.csv",
                       show_col_types = FALSE)  %>%
-  mutate(year = 2019)
+  mutate(Year = 2019)
 JPSP_2020 <- read_csv("data/jpsp/2020/PoPCites_2020.csv",
                       show_col_types = FALSE) %>%
-  mutate(year = 2020)
+  mutate(Year = 2020)
 JPSP_2021 <- read_csv("data/jpsp/2021/PoPCites_2021.csv",
                       show_col_types = FALSE) %>%
-  mutate(year = 2021)
+  mutate(Year = 2021)
 JPSP_2022 <- read_csv("data/jpsp/2022/PoPCites_2022.csv",
                       show_col_types = FALSE) %>%
-  mutate(year = 2022)
+  mutate(Year = 2022)
 
 
 # Combine all the data frames into one
 JPSP_combined <- bind_rows(JPSP_2017, JPSP_2018, JPSP_2019, JPSP_2020, JPSP_2021, JPSP_2022)
 
+df<- JPSP_combined
 
+combined_df <- df %>%
+  mutate(
+    trimmed_title = str_trunc(str_to_lower(str_squish(Title)), side = "right", width= 50, ellipsis = "…")) %>%
+    mutate(
+      trimmed_title = case_when(
+      TRUE ~ trimmed_title
+    )) %>%
+    mutate(
+          Title = str_squish(Title)
+  )  %>%
+  group_by(trimmed_title) %>%
+  arrange(desc(Cites)) %>%  # Sort within each group based on the number of citations
+  summarise(
+    Title = first(Title),  # Character: Keep first non-NA
+    trimmed_title = first(trimmed_title), 
+    CombinedCites = sum(Cites, na.rm = TRUE),  # Numeric: Sum
+    CombinedAuthors = paste(unique(Authors), collapse = "; "),  # Character: Concatenate unique
+    Year = max(Year, na.rm = TRUE),  # Numeric: Max
+    Source = first(Source),  # Character: Keep first non-NA
+    Publisher = first(Publisher),  # Character: Keep first non-NA
+    ArticleURL = first(ArticleURL),  # Character: Keep first non-NA
+    CitesURL = first(CitesURL),  # Character: Keep first non-NA
+    GSRank = first(GSRank),  # Numeric: Mean
+    QueryDate = first(QueryDate),  # Date: Most recent
+    Type = first(Type),  # Character: Keep first non-NA
+    DOI = first(DOI),  # Character: Keep first non-NA
+    CitationURL = first(CitationURL),  # Logical: Keep first non-NA
+    ECC = first(ECC),  # Numeric: Sum
+    CitesPerYear = first(CitesPerYear),  # Numeric: Mean
+    CitesPerAuthor = first(CitesPerAuthor),  # Numeric: Mean
+    AuthorCount = max(AuthorCount, na.rm = TRUE),  # Numeric: Max
+    Age = max(Age, na.rm = TRUE),  # Numeric: max
+    Abstract = first(Abstract),  # Character
+    FullTextURL = first(FullTextURL),  # Character: Keep first non-NA
+    RelatedURL = first(RelatedURL),  # Character: Keep first non-NA
+  ) %>% ungroup()  %>% 
+  # create unique dummy doi for articles without doi
+  mutate(
+         DOI = case_when(
+    is.na(DOI) ~ paste0("MISSING_DOI_", trimmed_title),
+    TRUE ~ DOI
+  ))  %>%
+  group_by(DOI) %>%
+  arrange(desc(CombinedCites))  %>%  # Sort within each group based on the number of citations
+  summarise(
+    Title = first(Title),  # Character: Keep first non-NA
+    trimmed_title = paste(unique(trimmed_title), collapse = "; "), 
+    CombinedCites = sum(CombinedCites, na.rm = TRUE),  # Numeric: Sum
+    CombinedAuthors = paste(unique(CombinedAuthors), collapse = "; "),  # Character: Concatenate unique
+    Year = max(Year, na.rm = TRUE),  # Numeric: Max
+    Source = first(Source),  # Character: Keep first non-NA
+    Publisher = first(Publisher),  # Character: Keep first non-NA
+    ArticleURL = first(ArticleURL),  # Character: Keep first non-NA
+    CitesURL = first(CitesURL),  # Character: Keep first non-NA
+    GSRank = first(GSRank),  # Numeric: Mean
+    QueryDate = first(QueryDate),  # Date: Most recent
+    Type = first(Type),  # Character: Keep first non-NA
+    DOI = first(DOI),  # Character: Keep first non-NA
+    CitationURL = first(CitationURL),  # Logical: Keep first non-NA
+    ECC = first(ECC),  # Numeric: Sum
+    CitesPerYear = first(CitesPerYear),  # Numeric: Mean
+    CitesPerAuthor = first(CitesPerAuthor),  # Numeric: Mean
+    AuthorCount = max(AuthorCount, na.rm = TRUE),  # Numeric: Max
+    Age = max(Age, na.rm = TRUE),  # Numeric: max
+    Abstract = first(Abstract),  # Character
+    FullTextURL = first(FullTextURL),  # Character: Keep first non-NA
+    RelatedURL = first(RelatedURL),  # Character: Keep first non-NA
+  ) %>% ungroup()
+
+
+write.csv(combined_df, "data/JPSP_deduplicated.csv")
 write.csv(JPSP_combined, "data/JPSP_combined.csv")
 
-df<- JPSP_combined
+df<- combined_df
 journal <- "JPSP"
 
 
@@ -52,5 +124,8 @@ There are ``r length(unique(df$DOI))`` articles. The average citation for a pape
 ```{r}
 # make an interactive table
 library(DT)
-datatable(df)
+
+combined_df %>% select(Title, CombinedAuthors, DOI, CombinedCites, Year, ArticleURL, CitesURL, FullTextURL
+              ) %>%
+datatable()
 ```
