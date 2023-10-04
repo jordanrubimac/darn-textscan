@@ -59,9 +59,7 @@ combined_df <- df %>%
       TRUE ~ trimmed_title
     )) %>%
     mutate(
-          Title = str_squish(Title),
-          DOI = case_when(trimmed_title == "who gets to vote?: racialized mental images of …" ~ "10.1177/1948550619899238",
-                    TRUE ~ DOI)
+          Title = str_squish(Title)
   )  %>%
   group_by(trimmed_title) %>%
   arrange(desc(Cites)) %>%  # Sort within each group based on the number of citations
@@ -95,6 +93,10 @@ combined_df <- df %>%
     is.na(DOI) ~ paste0("MISSING_DOI_", trimmed_title),
     TRUE ~ DOI
   ))  %>%
+  # must stay separate so that it's easy to replace the dummy doi with the real doi
+         mutate(
+         DOI = case_when( DOI == "MISSING_DOI_who gets to vote?: racialized mental images of …" ~ "10.1177/1948550619899238",
+                    TRUE ~ DOI)) %>%
   group_by(DOI) %>%
   arrange(desc(CombinedCites))  %>%  # Sort within each group based on the number of citations
   summarise(
