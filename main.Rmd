@@ -21,7 +21,13 @@ source("scripts/scraping_spps.R")
 source("scripts/scraping_pspb.R")
 ```
 
+
 ```{r}
 
-download_articles_spps(6)
+# import data
+SPPS_combined <- read.csv("data/SPPS_combined.csv") %>% mutate(journal = "SPPS")
+PSPB_combined <- read.csv("data/PSPB_combined.csv") %>% mutate(journal = "PSPB")
+JPSP_combined <- read.csv("data/JPSP_combined.csv") %>% mutate(journal = "JPSP")
+
+#download_articles_spps(6)
 ```

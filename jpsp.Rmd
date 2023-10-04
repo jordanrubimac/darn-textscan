@@ -1,12 +1,15 @@
 ---
-title: "R Notebook"
-output: html_notebook
+title: "JPSP"
+output: html_document
+editor_options: 
+  chunk_output_type: inline
 ---
 
 
 
 ```{r}
 library(tidyverse)
+source("scripts/helpers.R")
 
 # Add a 'year' column to each data frame
 JPSP_2017 <- read_csv("data/jpsp/2017/PoPCites_2017.csv",
@@ -33,12 +36,21 @@ JPSP_2022 <- read_csv("data/jpsp/2022/PoPCites_2022.csv",
 JPSP_combined <- bind_rows(JPSP_2017, JPSP_2018, JPSP_2019, JPSP_2020, JPSP_2021, JPSP_2022)
 
 
-nrow(JPSP_combined)
+write.csv(JPSP_combined, "data/JPSP_combined.csv")
 
+df<- JPSP_combined
+journal <- "JPSP"
 
 
 ```
 
-The average citation for a paper published in JSPS in our sample was ``r round(mean(JPSP_combined$Cites), digits=3)`` and the median citation was ``r median(JPSP_combined$Cites)``. The minimum citation was ``r min(JPSP_combined$Cites)`` and the maximum citation was ``r max(JPSP_combined$Cites)``. 
+
+There are ``r length(unique(df$DOI))`` articles. The average citation for a paper published in ``r journal`` in our sample was ``r round(mean(df$Cites), digits=3)`` and the median citation was ``r median(df$Cites)``. The minimum citation was ``r min(df$Cites)`` and the maximum citation was ``r max(df$Cites)``. 
+
+
 
 ```{r}
+# make an interactive table
+library(DT)
+datatable(df)
+```

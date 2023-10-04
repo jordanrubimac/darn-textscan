@@ -1,12 +1,15 @@
 ---
-title: "R Notebook"
-output: html_notebook
+title: "SPPS"
+output: html_document
+editor_options: 
+  chunk_output_type: inline
 ---
 
 
 
 ```{r}
 library(tidyverse)
+source("scripts/helpers.R")
 
 # Add a 'year' column to each data frame
 SPPS_2017 <- read_csv("data/spps/2017/PoPCites_2017.csv",
@@ -30,9 +33,32 @@ SPPS_2022 <- read_csv("data/spps/2022/PoPCites_2022.csv",
 
 
 # Combine all the data frames into one
-SPPS_combined <- bind_rows(SPPS_2017, SPPS_2018, SPPS_2019, SPPS_2020, SPPS_2021, SPPS_2022)
+SPPS_combined <- bind_rows(SPPS_2017, SPPS_2018, 
+                           SPPS_2019, SPPS_2020, SPPS_2021, SPPS_2022) %>%
+  filter(Title %in% c("Retraction Notice")
+         )
 
 
-nrow(SPPS_combined)
 
+
+
+
+write.csv(SPPS_combined, "data/SPPS_combined.csv")
+
+df<- SPPS_combined
+
+length(unique(df$DOI))
+journal <- "SPPS"
+
+```
+
+
+There are ``r length(unique(df$DOI))`` articles. The average citation for a paper published in ``r journal`` in our sample was ``r round(mean(df$Cites), digits=3)`` and the median citation was ``r median(df$Cites)``. The minimum citation was ``r min(df$Cites)`` and the maximum citation was ``r max(df$Cites)``. 
+
+```{r}
+# make an interactive table
+library(DT)
+
+df %>% select(Title, Authors, DOI, Cites, year) %>%
+datatable()
 ```
