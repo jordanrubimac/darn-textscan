@@ -7,10 +7,11 @@ editor_options:
 
 
 
-```{r}
+```{r, echo=FALSE}
 library(tidyverse)
 source("scripts/helpers.R")
-
+```
+```{r}
 # Add a 'year' column to each data frame
 PSPB_2017 <- read_csv("data/pspb/2017/PoPCites_2017.csv",
                       show_col_types = FALSE) %>%
@@ -138,6 +139,6 @@ There are ``r length(unique(df$DOI))`` articles. The average citation for a pape
 # make an interactive table
 library(DT)
 
-combined_df %>% select(Title, CombinedAuthors, DOI_missing, DOI, CombinedCites, Year, ArticleURL, FullTextURL, CitesUrl, CitationURL, RelatedURL) %>%
+combined_df %>% select(Title, CombinedAuthors, DOI_missing, DOI, CombinedCites, Year, ArticleURL, FullTextURL, CitationURL, RelatedURL) %>%
 datatable()
 ```

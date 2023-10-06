@@ -7,10 +7,12 @@ editor_options:
 
 
 
-```{r}
+
+```{r, echo=FALSE}
 library(tidyverse)
 source("scripts/helpers.R")
-
+```
+```{r}
 # Add a 'year' column to each data frame
 SPPS_2017 <- read_csv("data/spps/2017/PoPCites_2017.csv",
                       show_col_types = FALSE) %>%
@@ -80,12 +82,12 @@ combined_df <- df %>%
     Source = first(Source),  # Character: Keep first non-NA
     Publisher = first(Publisher),  # Character: Keep first non-NA
     ArticleURL = first(ArticleURL),  # Character: Keep first non-NA
-#    CitesURL = first(CitesURL),  # Character: Keep first non-NA
+    CitesURL = first(CitesURL),  # Character: Keep first non-NA
     GSRank = first(GSRank),  # Numeric: Mean
 #    QueryDate = first(QueryDate),  # Date: Most recent
 #    Type = first(Type),  # Character: Keep first non-NA
     DOI = first(DOI),  # Character: Keep first non-NA
-#    CitationURL = first(CitationURL),  # Logical: Keep first non-NA
+    CitationURL = first(CitationURL),  # Logical: Keep first non-NA
     ECC = first(ECC),  # Numeric: Sum
     CitesPerYear = first(CitesPerYear),  # Numeric: Mean
     CitesPerAuthor = first(CitesPerAuthor),  # Numeric: Mean
@@ -143,8 +145,6 @@ write.csv(SPPS_combined, "data/SPPS_combined.csv")
 write.csv(combined_df, "data/SPPS_deduplicated.csv")
 df<- combined_df
 
-
-length(unique(df$DOI))
 journal <- "SPPS"
 
 ```
@@ -156,6 +156,8 @@ There are ``r length(unique(df$DOI))`` articles. The average citation for a pape
 # make an interactive table
 library(DT)
 
-combined_df %>% select(Title, CombinedAuthors, DOI_missing, DOI, CombinedCites, Year, ArticleURL, FullTextURL, CitesUrl, CitationURL, RelatedURL) %>%
+combined_df %>% select(Title, CombinedAuthors, 
+                       DOI_missing, DOI, CombinedCites, Year, ArticleURL, FullTextURL, #CitesUrl,
+                       CitationURL, RelatedURL) %>%
 datatable()
 ```
