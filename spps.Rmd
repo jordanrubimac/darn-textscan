@@ -43,19 +43,27 @@ df<- SPPS_combined
 ```{r}
 combined_df <- df %>%
   mutate(
-    trimmed_title = str_trunc(str_to_lower(str_squish(Title)), side = "right", width= 50, ellipsis = "…")) %>%
+    trimmed_title = 
+      str_trunc(
+        str_squish(
+          str_remove_all(
+            str_to_lower(Title),"[[:punct:]]")), 
+                side = "right", 
+                width = 50, ellipsis = "")) %>%
     mutate(
       # manually matched some titles
       trimmed_title = case_when(
-      trimmed_title == "network analysis on attitudes" ~ "network analysis on attitudes: a brief tutorial",
-      RelatedURL == "https://scholar.google.com/scholar?q=related:dZc5rNWeL6MJ:scholar.google.com/&scioq=source:%22social+psychological+and+personality+science%22&hl=en&as_sdt=0,5&as_ylo=2022&as_yhi=2022" ~ 'who gets to vote?: racialized mental images of …', #there was no easy way to use the trimmed title, it had a forbidden character in it
-      trimmed_title == "equality revisited: a cultural meta-analysis of i…" ~ "equality revisited: a cross-cultural meta-analysi…",
-     trimmed_title == "does reduc‑ing prejudice increase outgroup identi…"~  "does reducing implicit prejudice increase out-gro…",
-      trimmed_title == "forthcoming,“laypersons' beliefs and intuitions a…" ~ "laypersons' beliefs and intuitions about free wil…",
-      trimmed_title == "studying the cognitive map of the us states" ~ "studying the cognitive map of the us states: ideo…",
-      trimmed_title == "flekova lucie, giorgi salvatore, hagan courtney, …" ~ "real men don't say “cute” using automatic languag…",
-     trimmed_title == "put the phone down" ~ "put the phone down: testing a complement-interfer…" ,
-      trimmed_title == "worldview conflict in daily life (vol 10, pg 35, …" ~ "worldview conflict in daily life",
+      trimmed_title == "network analysis on attitudes" ~ "network analysis on attitudes a brief tutorial",
+      trimmed_title == "equality revisited a cultural metaanalysis of inte" ~ "equality revisited a crosscultural metaanalysis of",
+     trimmed_title == "does reducing implicit prejudice increase outgroup
+"~  "does reducing prejudice increase outgroup identifi",
+      trimmed_title == "forthcominglaypersons beliefs and intuitions about
+" ~ "laypersons beliefs and intuitions about free will ",
+      trimmed_title == "studying the cognitive map of the us states" ~ "studying the cognitive map of the us states ideolo",
+      trimmed_title == "flekova lucie giorgi salvatore hagan courtney kern
+" ~ "real men dont say cute using automatic language an",
+     trimmed_title == "put the phone down" ~ "put the phone down testing a complementinterfere m" ,
+      trimmed_title == "worldview conflict in daily life vol 10 pg 35 2019" ~ "worldview conflict in daily life",
       TRUE ~ trimmed_title
     )) %>%
     mutate(
@@ -72,12 +80,12 @@ combined_df <- df %>%
     Source = first(Source),  # Character: Keep first non-NA
     Publisher = first(Publisher),  # Character: Keep first non-NA
     ArticleURL = first(ArticleURL),  # Character: Keep first non-NA
-    CitesURL = first(CitesURL),  # Character: Keep first non-NA
+#    CitesURL = first(CitesURL),  # Character: Keep first non-NA
     GSRank = first(GSRank),  # Numeric: Mean
-    QueryDate = first(QueryDate),  # Date: Most recent
-    Type = first(Type),  # Character: Keep first non-NA
+#    QueryDate = first(QueryDate),  # Date: Most recent
+#    Type = first(Type),  # Character: Keep first non-NA
     DOI = first(DOI),  # Character: Keep first non-NA
-    CitationURL = first(CitationURL),  # Logical: Keep first non-NA
+#    CitationURL = first(CitationURL),  # Logical: Keep first non-NA
     ECC = first(ECC),  # Numeric: Sum
     CitesPerYear = first(CitesPerYear),  # Numeric: Mean
     CitesPerAuthor = first(CitesPerAuthor),  # Numeric: Mean
@@ -89,13 +97,14 @@ combined_df <- df %>%
   ) %>% ungroup()  %>% 
   # create unique dummy doi for articles without doi
   mutate(
-         DOI = case_when(
+    DOI_missing = if_else(is.na(DOI), TRUE, FALSE),
+    DOI = case_when(
     is.na(DOI) ~ paste0("MISSING_DOI_", trimmed_title),
     TRUE ~ DOI
   ))  %>%
   # must stay separate so that it's easy to replace the dummy doi with the real doi
          mutate(
-         DOI = case_when( DOI == "MISSING_DOI_who gets to vote?: racialized mental images of …" ~ "10.1177/1948550619899238",
+         DOI = case_when( DOI == "MISSING_DOI_who gets to vote racialized mental images of legit" ~ "10.1177/1948550619899238",
                     TRUE ~ DOI)) %>%
   group_by(DOI) %>%
   arrange(desc(CombinedCites))  %>%  # Sort within each group based on the number of citations
@@ -110,9 +119,10 @@ combined_df <- df %>%
     ArticleURL = first(ArticleURL),  # Character: Keep first non-NA
     CitesURL = first(CitesURL),  # Character: Keep first non-NA
     GSRank = first(GSRank),  # Numeric: Mean
-    QueryDate = first(QueryDate),  # Date: Most recent
-    Type = first(Type),  # Character: Keep first non-NA
+#    QueryDate = first(QueryDate),  # Date: Most recent
+#    Type = first(Type),  # Character: Keep first non-NA
     DOI = first(DOI),  # Character: Keep first non-NA
+    DOI_missing = first(DOI_missing),
     CitationURL = first(CitationURL),  # Logical: Keep first non-NA
     ECC = first(ECC),  # Numeric: Sum
     CitesPerYear = first(CitesPerYear),  # Numeric: Mean
@@ -140,13 +150,12 @@ journal <- "SPPS"
 ```
 
 
-There are ``r length(unique(df$DOI))`` articles. The average citation for a paper published in ``r journal`` in our sample was ``r round(mean(df$Cites), digits=3)`` and the median citation was ``r median(df$Cites)``. The minimum citation was ``r min(df$Cites)`` and the maximum citation was ``r max(df$Cites)``. 
+There are ``r length(unique(df$DOI))`` articles. The average citation for a paper published in ``r journal`` in our sample was ``r round(mean(df$CombinedCites), digits=3)`` and the median citation was ``r median(df$CombinedCites)``. The minimum citation was ``r min(df$CombinedCites)`` and the maximum citation was ``r max(df$CombinedCites)``. 
 
 ```{r}
 # make an interactive table
 library(DT)
 
-combined_df %>% select(Title, CombinedAuthors, DOI, CombinedCites, Year, ArticleURL, CitesURL, FullTextURL
-              ) %>%
+combined_df %>% select(Title, CombinedAuthors, DOI_missing, DOI, CombinedCites, Year, ArticleURL, FullTextURL, CitesUrl, CitationURL, RelatedURL) %>%
 datatable()
 ```
