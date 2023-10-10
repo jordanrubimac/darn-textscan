@@ -62,7 +62,9 @@ download_articles_spps <- function(volume,
   }
 }
 
-
+#I would love to know how to get within the function to examine aspects of the environment, but alas.
+#I've been manually running the lines of the function and the issue's coming at line 34, with read_html.
+#I've tried adding in a header and identifying myself with 'user-agent', but that didn't seem to do anything. :(
 
 
 ###PROBLEM below
