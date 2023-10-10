@@ -3,7 +3,7 @@
 
 
 
-download_articles_spps <- function(volume,
+download_articles_pspb <- function(volume,
                                    PSPB_URL = "https://journals.sagepub.com/doi/pdf/",
                                    PSPB_DOWNLOAD_URL = "/?download=true",
                                    PSPB_BASE_URL = "https://journals.sagepub.com/toc/pspc",
@@ -44,7 +44,7 @@ download_articles_spps <- function(volume,
 
     urlPart1 = PSPB_URL
     urlYear = links %>% str_replace(".*abs/", "")
-    urlPart2 = SPPS_DOWNLOAD_URL
+    urlPart2 = PSPB_DOWNLOAD_URL
     urllist = paste(urlPart1, urlYear, urlPart2, sep = '')
 
     for (i in 1:length(urllist)){
