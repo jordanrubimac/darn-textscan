@@ -44,6 +44,7 @@ download_articles <- function(volume,
 
   volumeurl = paste0(VOLUME_BASE_URL, decade) %>% paste(year, sep='.')
   volumepage = GET(volumeurl, add_headers('user-agent' = 'Research Project')) %>% read_html()
+  ##Error comes from aboce line: can't use read_html (403 error response again)
   volumelinks <- volumepage %>% html_nodes("a") %>% html_attr("href")
   volumelinks <- volumelinks[which(regexpr(toString(volume), volumelinks) >= 1 & regexpr('toc', volumelinks) >= 1)]
 
