@@ -10,7 +10,7 @@ download_articles <- function(volume,
   require(httr)
   require(rvest)
   require(stringr)
-
+  
   journal <- match.arg(journal)
 
   if (!dir.exists(enddir)) {
@@ -21,7 +21,6 @@ download_articles <- function(volume,
   if (journal == "PSPB") {
 
     if(is.null(BASE_URL)) { BASE_URL = "https://journals.sagepub.com/toc/pspc" }
-    if(is.null(VOLUME_BASE_URL)) { VOLUME_BASE_URL = "https://journals.sagepub.com/loi/pspc/group/" }
 
     if (volume < 6) {
       decade <- "d1970"
@@ -31,7 +30,10 @@ download_articles <- function(volume,
       decade <- 'ERROR'
     }
     year = paste0('y', toString(volume + 1974))
+    nissues <- 12
   } else if (journal == "SPPS") {
+    if(is.null(BASE_URL)) { BASE_URL = "https://journals.sagepub.com/toc/sppa" }
+
     if (volume > 10) {
       decade = "d2020"
     } else if (volume < 11) {
@@ -40,15 +42,16 @@ download_articles <- function(volume,
       decade = 'ERROR'
     }
     year = paste0('y', toString(volume + 2009))
+    nissues <- 8
   }
 
-  volumeurl = paste0(VOLUME_BASE_URL, decade) %>% paste(year, sep='.')
-  volumepage = GET(volumeurl, add_headers('user-agent' = 'Research Project')) %>% read_html()
-  ##Error comes from aboce line: can't use read_html (403 error response again)
-  volumelinks <- volumepage %>% html_nodes("a") %>% html_attr("href")
-  volumelinks <- volumelinks[which(regexpr(toString(volume), volumelinks) >= 1 & regexpr('toc', volumelinks) >= 1)]
+  #volumeurl = paste0(VOLUME_BASE_URL, decade) %>% paste(year, sep='.')
+  #volumepage = GET(volumeurl, add_headers('user-agent' = 'Research Project')) %>% read_html()
+  ##Error comes from above line: can't use read_html (403 error response again)
+  #volumelinks <- volumepage %>% html_nodes("a") %>% html_attr("href")
+  #volumelinks <- volumelinks[which(regexpr(toString(volume), volumelinks) >= 1 & regexpr('toc', volumelinks) >= 1)]
 
-  for (j in 1:length(volumelinks)) {
+  for (j in 1:nissues) {
     if (is.null(provided_urls)) {
       url = paste(BASE_URL, volume, j, sep = '/')
       page = read_html(url)
@@ -80,6 +83,6 @@ download_articles <- function(volume,
       warning("Not all files were transferred successfully.")
     }
 
-    file.remove(from=paste0(startdir, filenames))
+    file.remove(from=paste0(startdir, filenames, sep="/"))
   }
 }
