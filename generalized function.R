@@ -50,11 +50,15 @@ download_articles <- function(volume,
   ##Error comes from above line: can't use read_html (403 error response again)
   #volumelinks <- volumepage %>% html_nodes("a") %>% html_attr("href")
   #volumelinks <- volumelinks[which(regexpr(toString(volume), volumelinks) >= 1 & regexpr('toc', volumelinks) >= 1)]
-
+  #10/31: removed, because this was just getting the number of issues, which is consistent in each journal. See new
+  #variable named 'nissues' created above.
+  
+  
   for (j in 1:nissues) {
     if (is.null(provided_urls)) {
       url = paste(BASE_URL, volume, j, sep = '/')
-      page = read_html(url)
+      page = GET(url, add_headers('user-agent' = 'Research Project')) %>% read_html()
+      ##Error is the above line: can no longer read the URLs on the page for each issue, which sucks.
       links <- page %>% html_nodes("a") %>% html_attr("href")
       links <- links[which(regexpr('abs', links) >= 1)]
 
