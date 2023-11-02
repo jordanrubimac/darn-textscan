@@ -57,7 +57,7 @@ download_articles <- function(volume,
   for (j in 1:nissues) {
     if (is.null(provided_urls)) {
       url = paste(BASE_URL, volume, j, sep = '/')
-      page = GET(url, add_headers('user-agent' = 'Research Project')) %>% read_html()
+      page = GET(url, add_headers('user-agent' = 'Mozilla/5.0')) %>% read_html()
       ##Error is the above line: can no longer read the URLs on the page for each issue, which sucks.
       links <- page %>% html_nodes("a") %>% html_attr("href")
       links <- links[which(regexpr('abs', links) >= 1)]
@@ -75,7 +75,9 @@ download_articles <- function(volume,
     }
 
     filenames = urlYear %>% str_replace(".*10.1177/", "") %>% paste(".pdf", sep = '')
-    Sys.sleep(15)
+    date_time<-Sys.time()
+    delay_seconds <- 70
+    while((as.numeric(Sys.time()) - as.numeric(date_time))<delay_seconds){}
 
     # Check if files copied successfully
     copied_files <- sapply(paste0(startdir, filenames), function(src) {
@@ -87,6 +89,7 @@ download_articles <- function(volume,
       warning("Not all files were transferred successfully.")
     }
 
-    file.remove(from=paste0(startdir, filenames, sep="/"))
+    #file.remove(from=paste(startdir, filenames, sep="/"))
+    #Removed for now, reason: file names aren't just the doi and pdf combined
   }
 }
