@@ -54,10 +54,10 @@ download_articles <- function(volume,
   #variable named 'nissues' created above.
   
   
-  for (j in 1:nissues) {
+  for (j in 1:nissue) {
     if (is.null(provided_urls)) {
       url = paste(BASE_URL, volume, j, sep = '/')
-      page = GET(url, add_headers('user-agent' = 'Mozilla/5.0')) %>% read_html()
+      page = GET(url, add_headers('user-agent' = 'Mozilla')) %>% read_html()
       ##Error is the above line: can no longer read the URLs on the page for each issue, which sucks.
       links <- page %>% html_nodes("a") %>% html_attr("href")
       links <- links[which(regexpr('abs', links) >= 1)]
@@ -72,6 +72,9 @@ download_articles <- function(volume,
 
     for (i in 1:length(urllist)) {
       browseURL(urllist[i])
+      date_time<-Sys.time()
+      delay_seconds <- 4
+      while((as.numeric(Sys.time()) - as.numeric(date_time))<delay_seconds){}
     }
 
     filenames = urlYear %>% str_replace(".*10.1177/", "") %>% paste(".pdf", sep = '')
@@ -93,3 +96,7 @@ download_articles <- function(volume,
     #Removed for now, reason: file names aren't just the doi and pdf combined
   }
 }
+
+#To run:
+#for (j in 43:48) {download_articles(j, "PSPB")}
+#Should take approximately 1 hr 20 minutes; time is necessary because of delay to avoid being blocked from SAGE.

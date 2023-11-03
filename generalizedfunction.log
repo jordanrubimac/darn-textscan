@@ -1,0 +1,6 @@
+Loading required package: httr
+Loading required package: rvest
+Loading required package: stringr
+Error in read_html.response(.) : Forbidden (HTTP 403).
+Calls: download_articles ... %>% -> read_html -> read_html.response -> <Anonymous>
+Execution halted
