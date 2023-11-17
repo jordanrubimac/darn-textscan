@@ -49,6 +49,7 @@ combined_df <- df %>%
                 width = 50, ellipsis = "")) %>%
     mutate(
       trimmed_title = case_when(
+      trimmed_title == "innovations in social psychology" ~ "is diversity enough crossrace and crossclass inter",
       TRUE ~ trimmed_title
     )) %>%
     mutate(
@@ -89,7 +90,7 @@ combined_df <- df %>%
   ))  %>%
   # must stay separate so that it's easy to replace the dummy doi with the real doi
          mutate(
-         DOI = case_when( DOI == "MISSING_DOI_EXAMPLE" ~ "10.1177/1948550619899238",
+         DOI = case_when(DOI == "MISSING_DOI_the incremental validity of average state selfrepo" ~ "10.1037/pspp0000136",
                     TRUE ~ DOI)) %>%
   group_by(DOI) %>%
   arrange(desc(CombinedCites))  %>%  # Sort within each group based on the number of citations
@@ -138,6 +139,6 @@ There are ``r length(unique(df$DOI))`` articles. The average citation for a pape
 # make an interactive table
 library(DT)
 
-combined_df %>% select(Title, CombinedAuthors, DOI_missing, DOI, CombinedCites, Year, ArticleURL, FullTextURL, CitationURL, RelatedURL) %>%
+combined_df %>% select(Title,trimmed_title, CombinedAuthors, DOI_missing, DOI, CombinedCites, Year, ArticleURL, FullTextURL, CitationURL, RelatedURL) %>%
 datatable()
 ```

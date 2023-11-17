@@ -156,8 +156,7 @@ There are ``r length(unique(df$DOI))`` articles. The average citation for a pape
 # make an interactive table
 library(DT)
 
-combined_df %>% select(Title, CombinedAuthors, 
-                       DOI_missing, DOI, CombinedCites, Year, ArticleURL, FullTextURL, #CitesUrl,
-                       CitationURL, RelatedURL) %>%
+
+combined_df %>% select(Title,trimmed_title, CombinedAuthors, DOI_missing, DOI, CombinedCites, Year, ArticleURL, FullTextURL, CitationURL, RelatedURL) %>%
 datatable()
 ```
