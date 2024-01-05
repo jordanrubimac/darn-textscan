@@ -11,7 +11,7 @@ download_articles <- function(volume,
   require(rvest)
   require(stringr)
   
-  journal <- match.arg(journal)
+  journal <- match.arg(journal)g
 
   if (!dir.exists(enddir)) {
     dir.create(file.path(enddir), recursive=TRUE)
