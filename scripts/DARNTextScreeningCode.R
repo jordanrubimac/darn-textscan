@@ -11,7 +11,9 @@ terms_to_screen_df <- read_csv(terms_to_screen_path)
 
 # Function to screen PDF for terms and get page numbers
 screen_pdf_for_terms <- function(pdf_file, terms_df) {
-  text <- pdf_text(eval(substitute(pdf_file)))
+  #browser()
+  text <- pdf_text(pdf_file)
+  #text <- pdf_text(eval(substitute(pdf_file)))
 
   cleaned_text <- gsub("[^[:alnum:] ]", "", text)
   cleaned_text <- tolower(cleaned_text)
@@ -40,20 +42,12 @@ screen_pdf_for_terms <- function(pdf_file, terms_df) {
 
 #Pull file names for just PDFs
 pdf_list <- list.files(pdf_files, pattern = "\\.pdf$")
-#Initialize empty DF
-fullresults <- data.frame(matrix(0, ncol = 4, nrow = 0))
 
 
-# alt version via chatgpt
+#Below works for a single article:
+screen_pdf_for_terms(pdf_list[1], terms_to_screen_df)
 
-screen_function <- function(pdf_name) {
-  current_pdf <- paste(eval(substitute(pdf_files)), '/', pdf_name, sep='')
-  screen_pdf_for_terms(current_pdf, terms_to_screen_df)
-}
-
-results_list <- lapply(pdf_list, screen_function)
-fullresults <- do.call(rbind, results_list)
+#This should work, after removing substitute(eval(pdf_file)) in the first line of function
+results_list <- lapply(pdf_list, screen_pdf_for_terms, terms_df = terms_to_screen_df)
 
 
-# Display the result
-print(fullresults)
