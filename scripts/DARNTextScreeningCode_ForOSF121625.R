@@ -11,12 +11,14 @@ terms_to_screen_path <- "~/GitHub/darn-textscan/data/terminologtoscan_darn.csv"
 
 # Read in the .CSV with the terms to screen
 terms_to_screen_df <- read_csv(terms_to_screen_path, col_names=F)
+
+#Adjust a few of the terms, such that the regular expressions screening will search for words that START with that word stem
 terms_to_screen_df[which(terms_to_screen_df$X1=='lame'),] <- "\\blame"
 terms_to_screen_df[which(terms_to_screen_df$X1=='abled'),] <- "\\babled"
 terms_to_screen_df[which(terms_to_screen_df$X1=='Ailing'),] <- "\\bailing"
 
 
-# Function to screen PDF for terms and get page numbers
+# Function to screen each PDF for terms, return the term, author, year, and title of article
 screen_pdf_for_terms <- function(pdf_file, terms_df) {
   #browser()
   text <- pdf_text(pdf_file)
@@ -46,43 +48,13 @@ screen_pdf_for_terms <- function(pdf_file, terms_df) {
   results_df <- do.call(rbind, Filter(NROW, results))
   return(results_df)
 }
-#pdf_info, split pdf_file "-" into name, year, title
-#AFTER changing kitayama
-#any errors are probably missed hyphens
 
-#Pull file names for just PDFs
+#Pull file names for the PDFs
 pdf_list <- list.files(pdf_files, pattern = "\\.pdf$")
 
-
-#Below works for a single article:
-screen_pdf_for_terms(pdf_list[2], terms_to_screen_df)
-
-#This should work, after removing substitute(eval(pdf_file)) in the first line of function
+#Apply the function across all of the pdfs to screen
 results_list <- lapply(pdf_list, screen_pdf_for_terms, terms_df = terms_to_screen_df)
-#.csv with the output!
+
+#Write output
 results_csv <- bind_rows(results_list)
-write_csv(results_csv, "jpsp_screenedarticleterms.csv")
-
-
-#list of articles to be skimmed through
-listofarticles <- results_csv[!duplicated(results_csv$title), c(2:4)]
-write_csv(listofarticles, "jpsp_screenedarticles.csv")
-
-
-#RUN AGAIN, check to make sure lame and ailing aren't getting other words (blame, failing)
-
-
-
-
-#1: pre-reg
-#2: email pre-reg
-#3: Google sheet
-#4: Will adds column
-#5: test 50 instances
-##Jordan: test
-#6: ask jenni about RAs
-#7: harzing comparison for SPPS/JPSP
-#8: Run for JPSP/SPPS
-#9: work weekend for manuscript?
-#10: w2m for new semester?
-
+write_csv(results_csv, "screenedarticleterms.csv")
